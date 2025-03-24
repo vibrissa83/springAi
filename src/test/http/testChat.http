@@ -1,0 +1,10 @@
+###
+
+# curl -X POST http://localhost:8080/api/chat -H "Content-Type: application/json" -d "\"안녕하세요!\""
+POST http://localhost:8080/api/chat
+Content-Type: application/json
+
+"안녕하세요! 저는 저렴한 전기차를 찾고 있습니다. 추천할 만한게 있나요?"
+
+###
+

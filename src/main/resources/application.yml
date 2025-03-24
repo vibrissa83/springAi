@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: springAi
+  ai:
+    openai:
+      api-key: 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
+      model: gpt-4o                        # 모델 이름 명시
+      max-tokens: 2000                     # 출력 토큰 제한 설정 (필요에 따라 가변)
+      temperature: 0.8                     # Chatbot의 응답의 창의성 설정
