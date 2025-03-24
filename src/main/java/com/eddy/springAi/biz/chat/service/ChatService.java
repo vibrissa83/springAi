@@ -20,6 +20,10 @@ public class ChatService {
 
     // 채팅 요청과 AI 응답 처리
     public ChatResponse processChat(ChatRequest chatRequest) {
+
+        // 채팅 요청 저장
+        chatRepository.saveChat(chatRequest);
+
         // AI 호출
         String aiResponse = callOpenAi(chatRequest.getChatMessge());
 
@@ -27,10 +31,11 @@ public class ChatService {
         saveChatHistory(chatRequest.getCustomerKey(), "USER", chatRequest.getChatMessge());
         saveChatHistory(chatRequest.getCustomerKey(), "AI", aiResponse);
 
-        // 채팅 요청 저장
-        chatRepository.saveChat(chatRequest);
-
+        //응답내용 반환
         ChatResponse response = new ChatResponse();
+        response.setChatDttm(LocalDateTime.now());
+        response.setChatMessge(aiResponse);
+        response.setCustomerKey(chatRequest.getCustomerKey());
 
         return response;
     }
