@@ -1,4 +1,4 @@
-package com.eddy.springAi;
+package com.eddy.springAi.cmm;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
