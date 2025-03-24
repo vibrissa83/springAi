@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,9 @@ public class ChatService {
     // 채팅 요청과 AI 응답 처리
     public ChatResponse processChat(ChatRequest chatRequest) {
 
+        //응답내용 반환
+        ChatResponse response = new ChatResponse();
+
         // 채팅 요청 저장
         chatRepository.saveChat(chatRequest);
 
@@ -28,11 +32,9 @@ public class ChatService {
         String aiResponse = callOpenAi(chatRequest.getChatMessge());
 
         // 채팅 히스토리 저장
-        saveChatHistory(chatRequest.getCustomerKey(), "USER", chatRequest.getChatMessge());
-        saveChatHistory(chatRequest.getCustomerKey(), "AI", aiResponse);
+        saveChatHistory(chatRequest.getId(), chatRequest.getCustomerKey(), "USER", chatRequest.getChatMessge(), chatRequest.getChatDttm());
+        saveChatHistory(UUID.randomUUID().toString(), chatRequest.getCustomerKey(), "AI", aiResponse, response.getChatDttm());
 
-        //응답내용 반환
-        ChatResponse response = new ChatResponse();
         response.setChatDttm(LocalDateTime.now());
         response.setChatMessge(aiResponse);
         response.setCustomerKey(chatRequest.getCustomerKey());
@@ -41,11 +43,13 @@ public class ChatService {
     }
 
     // 채팅 히스토리 저장
-    private void saveChatHistory(String customerKey, String sender, String message) {
+    private void saveChatHistory(String id, String customerKey, String sender, String message, LocalDateTime chatDttm) {
         ChatHistory chatHistory = new ChatHistory();
+        chatHistory.setId(id);
+        chatHistory.setCustomerKey(customerKey);
         chatHistory.setSender(sender);
         chatHistory.setChatMessage(message);
-        chatHistory.setChatDttm(LocalDateTime.now());
+        chatHistory.setChatDttm(chatDttm);
         chatRepository.saveHist(chatHistory);
     }
 

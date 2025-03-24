@@ -9,7 +9,9 @@ import java.time.LocalDateTime;
 @Setter
 public class ChatHistory {
 
-    private Long id;
+    private String id;
+
+    private String customerKey; // 고객 식별 키
 
     private String sender; // 메시지 발신자 (USER / AI)
 
