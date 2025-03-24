@@ -22,19 +22,29 @@ public class ChatService {
     // 채팅 요청과 AI 응답 처리
     public ChatResponse processChat(ChatRequest chatRequest) {
 
-        //응답내용 반환
         ChatResponse response = new ChatResponse();
 
-        // 채팅 요청 저장
+        // 채팅 요청 저장 (최신 요청을 기록)
         chatRepository.saveChat(chatRequest);
 
-        // AI 호출
-        String aiResponse = callOpenAi(chatRequest.getChatMessge());
+        // 1. 기존 히스토리 조회 - 특정 CustomerKey로 이전 대화 불러오기
+        List<ChatHistory> chatHistories = chatRepository.findHistoriesByCustomerKey(chatRequest.getCustomerKey());
 
-        // 채팅 히스토리 저장
+        // 2. Open AI 호출
+        String aiResponse;
+        if (chatHistories.isEmpty()) {
+            // 히스토리가 없을 경우: 초기 인사말과 요청 정보 전달
+            aiResponse = callOpenAiFirst(chatRequest);
+        } else {
+            // 히스토리가 있을 경우: 대화 맥락을 AI에 전달하여 응답 생성
+            aiResponse = callOpenAi(chatRequest, chatHistories);
+        }
+
+        // 3. 대화 히스토리 저장
         saveChatHistory(chatRequest.getId(), chatRequest.getCustomerKey(), "USER", chatRequest.getChatMessge(), chatRequest.getChatDttm());
         saveChatHistory(UUID.randomUUID().toString(), chatRequest.getCustomerKey(), "AI", aiResponse, response.getChatDttm());
 
+        // 응답 완성
         response.setChatDttm(LocalDateTime.now());
         response.setChatMessge(aiResponse);
         response.setCustomerKey(chatRequest.getCustomerKey());
@@ -53,13 +63,49 @@ public class ChatService {
         chatRepository.saveHist(chatHistory);
     }
 
-    // AI 호출
-    private String callOpenAi(String message) {
-        String systemPrompt = "당신은 현대자동차 딜러의 상담 역할을 하는 AI입니다. 상담 내용을 전문적으로 처리하세요.\n";
+    // Open AI 호출
+    private String callOpenAi(ChatRequest chatRequest, List<ChatHistory> chatHistories) {
+        // 1. System Prompt 설정
+        StringBuilder fullPrompt = new StringBuilder();
+        fullPrompt.append("당신은 현대자동차 딜러의 상담 역할을 하는 AI입니다. 다음은 대화 기록입니다.\n");
 
-        String fullPrompt = systemPrompt + "User: " + message;
-        return openAiChatModel.call(fullPrompt);
+        // 2. 이전 대화 내역 추가
+        for (ChatHistory history : chatHistories) {
+            fullPrompt.append(history.getSender()).append(": ").append(history.getChatMessage()).append("\n");
+        }
+
+        // 3. 요청 정보 추가
+        fullPrompt.append("고객 요청 정보:\n");
+        fullPrompt.append("- 대리점: ").append(chatRequest.getDealerShop()).append("\n");
+        fullPrompt.append("- 차종: ").append(chatRequest.getCarModel()).append("\n\n");
+
+        // 4. 사용자의 최신 메시지 추가
+        fullPrompt.append("USER: ").append(chatRequest.getChatMessge()).append("\n");
+
+        // 5. AI 호출
+        return openAiChatModel.call(fullPrompt.toString());
     }
+
+    // Open AI 최초 호출
+    private String callOpenAiFirst(ChatRequest chatRequest) {
+        // 1. System Prompt 작성
+        StringBuilder fullPrompt = new StringBuilder();
+        fullPrompt.append("당신은 현대자동차 딜러의 상담 역할을 하는 AI 입니다.\n");
+        fullPrompt.append("고객이 처음 상담을 시작 했습니다. 아래 정보를 참고해 응답 해주세요.\n\n");
+
+        // 2. 요청 정보 추가
+        fullPrompt.append("고객 요청 정보:\n");
+        fullPrompt.append("- 대리점: ").append(chatRequest.getDealerShop()).append("\n");
+        fullPrompt.append("- 차종: ").append(chatRequest.getCarModel()).append("\n\n");
+
+        // 3. 사용자 초기 메시지 추가
+        fullPrompt.append("USER: ").append(chatRequest.getChatMessge()).append("\n");
+
+        // 4. AI 호출
+        return openAiChatModel.call(fullPrompt.toString());
+    }
+
+
 
     // 특정 고객의 히스토리 조회
     public List<ChatHistory> getChatHistories(String customerKey) {
