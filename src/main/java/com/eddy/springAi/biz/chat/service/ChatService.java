@@ -40,6 +40,9 @@ public class ChatService {
             aiResponse = callOpenAi(chatRequest, chatHistories);
         }
 
+        // 아스트릭트 제거
+        aiResponse = aiResponse.replace("*", "");
+
         // 3. 대화 히스토리 저장
         saveChatHistory(chatRequest.getId(), chatRequest.getCustomerKey(), "USER", chatRequest.getChatMessge(), chatRequest.getChatDttm());
         saveChatHistory(UUID.randomUUID().toString(), chatRequest.getCustomerKey(), "AI", aiResponse, response.getChatDttm());
@@ -67,7 +70,10 @@ public class ChatService {
     private String callOpenAi(ChatRequest chatRequest, List<ChatHistory> chatHistories) {
         // 1. System Prompt 설정
         StringBuilder fullPrompt = new StringBuilder();
-        fullPrompt.append("당신은 현대자동차 딜러의 상담 역할을 하는 AI입니다. 다음은 대화 기록입니다.\n");
+        fullPrompt.append("당신은 현대자동차 딜러의 상담 역할을 하는 AI 입니다.\n" +
+                "답변할때 '*'를 쓰지 않습니다. 'AI:' 같은 말머리도 붙이지 않습니다.\n" +
+                "자연스럽게 대화하듯이 답변을 해주세요.\n" +
+                "다음은 대화 기록입니다. 대화를 이어가 주세요.\n\n");
 
         // 2. 이전 대화 내역 추가
         for (ChatHistory history : chatHistories) {
@@ -80,7 +86,7 @@ public class ChatService {
         fullPrompt.append("- 차종: ").append(chatRequest.getCarModel()).append("\n\n");
 
         // 4. 사용자의 최신 메시지 추가
-        fullPrompt.append("USER: ").append(chatRequest.getChatMessge()).append("\n");
+        fullPrompt.append("- 사용자의 채팅 : ").append(chatRequest.getChatMessge()).append("\n");
 
         // 5. AI 호출
         return openAiChatModel.call(fullPrompt.toString());
@@ -90,8 +96,10 @@ public class ChatService {
     private String callOpenAiFirst(ChatRequest chatRequest) {
         // 1. System Prompt 작성
         StringBuilder fullPrompt = new StringBuilder();
-        fullPrompt.append("당신은 현대자동차 딜러의 상담 역할을 하는 AI 입니다.\n");
-        fullPrompt.append("고객이 처음 상담을 시작 했습니다. 아래 정보를 참고해 응답 해주세요.\n\n");
+        fullPrompt.append("당신은 현대자동차 딜러의 상담 역할을 하는 AI입니다.\n" +
+                "답변할때 '*'를 쓰지 않습니다. 'AI:' 같은 말머리도 붙이지 않습니다.\n" +
+                "자연스럽게 대화하듯이 답변을 해주세요.\n"+
+                "아래 정보를 참고해 응답 해주세요.\n\n");
 
         // 2. 요청 정보 추가
         fullPrompt.append("고객 요청 정보:\n");
@@ -99,7 +107,7 @@ public class ChatService {
         fullPrompt.append("- 차종: ").append(chatRequest.getCarModel()).append("\n\n");
 
         // 3. 사용자 초기 메시지 추가
-        fullPrompt.append("USER: ").append(chatRequest.getChatMessge()).append("\n");
+        fullPrompt.append("- 사용자의 채팅 : ").append(chatRequest.getChatMessge()).append("\n");
 
         // 4. AI 호출
         return openAiChatModel.call(fullPrompt.toString());
