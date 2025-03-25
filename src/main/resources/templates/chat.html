@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>딜러 도우미</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .chat-container {
+            width: 50%;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .chat-window {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 8px;
+            margin-bottom: 16px;
+        }
+
+        .message {
+            margin-bottom: 8px;
+        }
+
+        .message.user {
+            text-align: right;
+        }
+
+        .message.bot {
+            text-align: left;
+        }
+
+        .select-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .input-container {
+            display: flex;
+        }
+
+        .input-container input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .input-container button {
+            margin-left: 8px;
+            padding: 8px 16px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .input-container button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<div class="chat-container">
+    <h2>현대 자동차 딜러 도우미</h2>
+    <div class="select-container">
+        <div>
+            <label for="carModelSelect">차량 모델:</label>
+            <select id="carModelSelect">
+                <option value="소나타">소나타</option>
+                <option value="아반떼">아반떼</option>
+                <option value="투싼">투싼</option>
+                <option value="싼타페">싼타페</option>
+            </select>
+        </div>
+        <div>
+            <label for="dealerShopSelect">딜러샵:</label>
+            <select id="dealerShopSelect">
+                <option value="서울 강남구 대리점">서울 강남점</option>
+                <option value="Busan">경기 구리점</option>
+                <option value="Incheon">인천 송파점</option>
+                <option value="Daegu">대구 달서구점</option>
+            </select>
+        </div>
+    </div>
+    <div class="chat-window" id="chatWindow">
+        <!-- 채팅 메시지가 여기에 표시됩니다 -->
+    </div>
+    <div class="input-container">
+        <input type="text" id="chatInput" placeholder="Type a message">
+        <button id="sendButton">Send</button>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        const customerKey = getOrCreateCustomerKey(); // 브라우저에서 관리되는 customerKey
+
+        // Send 버튼 클릭 이벤트
+        $('#sendButton').click(function () {
+            sendMessage();
+        });
+
+        // Enter 키 입력 이벤트
+        $('#chatInput').keypress(function (e) {
+            if (e.which === 13) {
+                sendMessage();
+            }
+        });
+
+        // 메시지 전송 함수
+        function sendMessage() {
+            const message = $('#chatInput').val();
+            const carModel = $('#carModelSelect').val(); // 선택된 차량 모델
+            const dealerShop = $('#dealerShopSelect').val(); // 선택된 딜러샵
+
+            if (!message.trim()) {
+                alert('메시지를 입력해주세요.');
+                return;
+            }
+
+            // 사용자 입력 메시지를 채팅 창에 표시
+            appendMessage('user', message);
+            $('#chatInput').val(''); // 입력 필드 초기화
+
+            // 서버로 메시지 전송
+            $.ajax({
+                url: '/api/chat',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    customerKey: customerKey, // 브라우저에서 관리되는 고객 키
+                    carModel: carModel,      // 차량 모델
+                    dealerShop: dealerShop,  // 딜러샵
+                    chatMessge: message,
+                    chatDttm: new Date().toISOString()
+                }),
+                success: function (response) {
+                    // 서버 응답 메시지를 채팅 창에 표시
+                    appendMessage('bot', response.chatMessge || 'No response from server.');
+                },
+                error: function () {
+                    appendMessage('bot', '서버에 연결할 수 없습니다.');
+                }
+            });
+        }
+
+        // 메시지를 채팅 창에 추가
+        function appendMessage(sender, text) {
+            const $chatWindow = $('#chatWindow');
+            const timestamp = new Date().toLocaleTimeString(); // 간단한 시간 표시 추가
+            $chatWindow.append(
+                `<div class="message ${sender}">
+                    <strong>${sender === 'bot' ? 'Bot' : 'You'}:</strong> ${text}<br>
+                    <small>${timestamp}</small>
+                </div>`
+            );
+            $chatWindow.scrollTop($chatWindow[0].scrollHeight); // 스크롤 아래로 이동
+        }
+
+        // 브라우저에서 customerKey 가져오거나 생성하는 함수
+        function getOrCreateCustomerKey() {
+            const savedKey = localStorage.getItem('customerKey'); // localStorage에서 키 가져오기
+            if (savedKey) {
+                return savedKey; // 키가 이미 있다면 반환
+            } else {
+                const newKey = generateUUID(); // 새로운 UUID 생성
+                localStorage.setItem('customerKey', newKey); // localStorage에 저장
+                return newKey;
+            }
+        }
+
+        // UUID 생성 유틸리티 함수
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+    });
+</script>
+</body>
+</html>
