@@ -19,7 +19,12 @@ public class ChatService {
     private final ChatRepository chatRepository;
     private final OpenAiChatModel openAiChatModel;
 
-    // 채팅 요청과 AI 응답 처리
+    /**
+     * 채팅 요청을 처리하고 AI 응답을 생성합니다.
+     *
+     * @param chatRequest 사용자 채팅 요청 정보
+     * @return 생성된 AI 응답
+     */
     public ChatResponse processChat(ChatRequest chatRequest) {
 
         ChatResponse response = new ChatResponse();
@@ -55,7 +60,15 @@ public class ChatService {
         return response;
     }
 
-    // 채팅 히스토리 저장
+    /**
+     * 채팅 히스토리를 저장합니다.
+     *
+     * @param id          히스토리 ID
+     * @param customerKey 고객 고유 키
+     * @param sender      메시지 발신자(예: USER, AI)
+     * @param message     저장할 메시지 내용
+     * @param chatDttm    메시지의 날짜 및 시간
+     */
     private void saveChatHistory(String id, String customerKey, String sender, String message, LocalDateTime chatDttm) {
         ChatHistory chatHistory = new ChatHistory();
         chatHistory.setId(id);
@@ -66,7 +79,13 @@ public class ChatService {
         chatRepository.saveHist(chatHistory);
     }
 
-    // Open AI 호출
+    /**
+     * 이전 채팅 히스토리를 참조하여 Open AI를 호출합니다.
+     *
+     * @param chatRequest   사용자 채팅 요청 정보
+     * @param chatHistories 해당 사용자와 관련된 이전 히스토리 목록
+     * @return Open AI의 응답 메시지
+     */
     private String callOpenAi(ChatRequest chatRequest, List<ChatHistory> chatHistories) {
         // 1. System Prompt 설정
         StringBuilder fullPrompt = new StringBuilder();
@@ -92,7 +111,12 @@ public class ChatService {
         return openAiChatModel.call(fullPrompt.toString());
     }
 
-    // Open AI 최초 호출
+    /**
+     * 사용자의 첫 요청에 대해 Open AI를 호출합니다.
+     *
+     * @param chatRequest 사용자 채팅 요청 정보
+     * @return Open AI의 응답 메시지
+     */
     private String callOpenAiFirst(ChatRequest chatRequest) {
         // 1. System Prompt 작성
         StringBuilder fullPrompt = new StringBuilder();
@@ -114,8 +138,12 @@ public class ChatService {
     }
 
 
-
-    // 특정 고객의 히스토리 조회
+    /**
+     * 특정 고객에 대한 채팅 히스토리를 조회합니다.
+     *
+     * @param customerKey 조회할 고객 고유 키
+     * @return 해당 고객의 채팅 히스토리 리스트
+     */
     public List<ChatHistory> getChatHistories(String customerKey) {
         return chatRepository.findHistoriesByCustomerKey(customerKey);
     }
