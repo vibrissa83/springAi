@@ -11,6 +11,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ChatResponse {
     private String customerKey;  // 고객 식별 키
-    private String chatMessge;   // 답변 메시지
+    private String chatMessage;   // 답변 메시지
     private LocalDateTime chatDttm = LocalDateTime.now(); // 답변 생성 시간
 }

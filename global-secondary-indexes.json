@@ -1,0 +1,14 @@
+[
+  {
+    "IndexName": "customerKey-index",
+    "KeySchema": [
+      {
+        "AttributeName": "CUSTOMER_KEY",
+        "KeyType": "HASH"
+      }
+    ],
+    "Projection": {
+      "ProjectionType": "ALL"
+    }
+  }
+]

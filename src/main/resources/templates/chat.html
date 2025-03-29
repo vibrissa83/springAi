@@ -141,12 +141,12 @@
                     customerKey: customerKey, // 브라우저에서 관리되는 고객 키
                     carModel: carModel,      // 차량 모델
                     dealerShop: dealerShop,  // 딜러샵
-                    chatMessge: message,
+                    chatMessage: message,
                     chatDttm: new Date().toISOString()
                 }),
                 success: function (response) {
                     // 서버 응답 메시지를 채팅 창에 표시
-                    appendMessage('bot', response.chatMessge || 'No response from server.');
+                    appendMessage('bot', response.chatMessage || 'No response from server.');
                 },
                 error: function () {
                     appendMessage('bot', '서버에 연결할 수 없습니다.');

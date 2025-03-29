@@ -8,7 +8,7 @@ Content-Type: application/json
   "customerKey": "customer123",
   "carModel": "더 뉴 아이오닉 5",
   "dealerShop": "서울 강남 대리점",
-  "chatMessge": "아하 그렇군요~"
+  "chatMessage": "아하 그렇군요~"
 }
 
 

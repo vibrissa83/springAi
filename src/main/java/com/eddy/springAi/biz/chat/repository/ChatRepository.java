@@ -34,7 +34,7 @@ public class ChatRepository {
         item.put("CUSTOMER_KEY", AttributeValue.builder().s(chatRequest.getCustomerKey()).build());
         item.put("CAR_MODEL", AttributeValue.builder().s(chatRequest.getCarModel()).build());
         item.put("DEALER_SHOP", AttributeValue.builder().s(chatRequest.getDealerShop()).build());
-        item.put("CHAT_MESSGE", AttributeValue.builder().s(chatRequest.getChatMessge()).build());
+        item.put("CHAT_MESSAGE", AttributeValue.builder().s(chatRequest.getChatMessage()).build());
         item.put("CREATED_DTTM", AttributeValue.builder().s(chatRequest.getChatDttm().toString()).build());
 
         dynamoDbClient.putItem(request -> request.tableName(CHAT_REQUEST_TABLE).item(item));
@@ -61,17 +61,19 @@ public class ChatRepository {
      * @return List<ChatHistory> - 조회된 채팅 히스토리 데이터 리스트
      */
     public List<ChatHistory> findHistoriesByCustomerKey(String customerKey) {
-        Map<String, AttributeValue> expressionValues = new HashMap<>();
-        expressionValues.put(":customerKey", AttributeValue.builder().s(customerKey).build());
-
+        // GSI를 사용한 QueryRequest 설정
         QueryRequest queryRequest = QueryRequest.builder()
-                .tableName(CHAT_HISTORY_TABLE)
-                .keyConditionExpression("CUSTOMER_KEY = :customerKey")
-                .expressionAttributeValues(expressionValues)
+                .tableName(CHAT_HISTORY_TABLE) // 테이블 이름
+                .indexName("customerKey-index") // GSI 이름
+                .keyConditionExpression("CUSTOMER_KEY = :customerKey") // GSI Key 사용
+                .expressionAttributeValues(Map.of(":customerKey", AttributeValue.builder().s(customerKey).build())) // 파라미터 바인딩
                 .build();
 
-        QueryResponse response = dynamoDbClient.query(queryRequest);
-        return response.items().stream().map(this::mapToChatHistory).collect(Collectors.toList());
+        QueryResponse queryResponse = dynamoDbClient.query(queryRequest);
+
+        return queryResponse.items().stream()
+                .map(this::mapToChatHistory) // 결과를 모델 객체로 변환
+                .collect(Collectors.toList());
     }
 
     /**

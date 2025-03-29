@@ -24,7 +24,7 @@ public class ChatRequest {
     private String dealerShop; // 대리점
 
     @NotBlank(message = "메시지 내용는 필수입니다.")
-    private String chatMessge; // 질문내역
+    private String chatMessage; // 질문내역
 
     private LocalDateTime chatDttm = LocalDateTime.now(); // 상담 생성 시간
 }
