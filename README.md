@@ -12,7 +12,7 @@ aws dynamodb create-table `
         AttributeName=CUSTOMER_KEY,AttributeType=S `
     --key-schema `
         AttributeName=ID,KeyType=HASH `
-    --global-secondary-indexes file://C:/Eddysworkspace/springAi/global-secondary-indexes.json `
+    --global-secondary-indexes file://C:/yourworkspace/springAi/global-secondary-indexes.json `
     --billing-mode PAY_PER_REQUEST `
     --region ap-northeast-2
 ```
@@ -25,7 +25,7 @@ aws dynamodb create-table `
         AttributeName=CUSTOMER_KEY,AttributeType=S `
     --key-schema `
         AttributeName=ID,KeyType=HASH `
-    --global-secondary-indexes file://C:/Eddysworkspace/springAi/global-secondary-indexes.json `
+    --global-secondary-indexes file://C:/yourworkspace/springAi/global-secondary-indexes.json `
     --billing-mode PAY_PER_REQUEST `
     --region ap-northeast-2
 ```
@@ -42,11 +42,11 @@ aws dynamodb create-table `
        openai:
          api-key: <YOUR_OPENAI_API_KEY>
 ```
-1. **프로젝트 실행** Maven으로 스프링 애플리케이션을 실행합니다:
+2. **프로젝트 실행** Maven으로 스프링 애플리케이션을 실행합니다:
 ``` bash
    ./mvnw spring-boot:run
 ```
-1. **웹 브라우저에서 접속** 기본 URL: `http://localhost:8080/chat`
+3. **웹 브라우저에서 접속** 기본 URL: `http://localhost:8080/chat`
 
 ## 참고
 이 프로젝트는 학습 및 확장용으로 제작되었습니다. 자유롭게 수정, 재배포가 가능합니다.
