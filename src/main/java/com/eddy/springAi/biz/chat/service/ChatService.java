@@ -40,10 +40,6 @@ public class ChatService {
         // 2. OpenAI 요청 메시지 빌드
         String payload = buildOpenAiPayload(chatRequest, chatHistories);
 
-
-        // 채팅 요청 저장 (최신 요청을 기록)
-        chatRepository.saveChat(chatRequest);
-
         // 3. OpenAI 호출 및 응답 처리
         String aiResponse = openAiChatModel.call(payload);
 
@@ -116,17 +112,4 @@ public class ChatService {
             throw new RuntimeException("Failed to build OpenAI payload", e);
         }
     }
-
-
-
-    /**
-     * 특정 고객에 대한 채팅 히스토리를 조회합니다.
-     *
-     * @param customerKey 조회할 고객 고유 키
-     * @return 해당 고객의 채팅 히스토리 리스트
-     */
-    public List<ChatHistory> getChatHistories(String customerKey) {
-        return chatRepository.findHistoriesByCustomerKey(customerKey);
-    }
-
 }

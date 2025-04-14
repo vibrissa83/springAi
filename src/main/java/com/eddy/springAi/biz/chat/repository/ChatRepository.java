@@ -21,24 +21,7 @@ import java.util.stream.Collectors;
 public class ChatRepository {
     private final DynamoDbClient dynamoDbClient;
 
-    private static final String CHAT_REQUEST_TABLE = "CUST_CHAT";
     private static final String CHAT_HISTORY_TABLE = "CUST_CHAT_HISTORY";
-
-    /**
-     * 고객 상담 데이터를 DynamoDB에 저장
-     * @param chatRequest - 고객 상담 요청 데이터(Model 객체)
-     */
-    public void saveChat(ChatRequest chatRequest) {
-        Map<String, AttributeValue> item = new HashMap<>();
-        item.put("ID", AttributeValue.builder().s(chatRequest.getId()).build());
-        item.put("CUSTOMER_KEY", AttributeValue.builder().s(chatRequest.getCustomerKey()).build());
-        item.put("CAR_MODEL", AttributeValue.builder().s(chatRequest.getCarModel()).build());
-        item.put("DEALER_SHOP", AttributeValue.builder().s(chatRequest.getDealerShop()).build());
-        item.put("CHAT_MESSAGE", AttributeValue.builder().s(chatRequest.getChatMessage()).build());
-        item.put("CREATED_DTTM", AttributeValue.builder().s(chatRequest.getChatDttm().toString()).build());
-
-        dynamoDbClient.putItem(request -> request.tableName(CHAT_REQUEST_TABLE).item(item));
-    }
 
     /**
      * 채팅 히스토리 데이터를 DynamoDB에 저장

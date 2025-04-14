@@ -2,20 +2,8 @@
 ## 소개
 SpringAI와 AWS DynamoDB를 활용하여 고객 상담 데이터를 저장하고, AI와 상호작용할 수 있는 간단한 챗봇 프로젝트입니다.
 ## DynamoDB 테이블 생성
-챗봇은 고객 상담 요청과 히스토리를 관리하기 위해 아래와 같이 두 개의 DynamoDB 테이블을 사용합니다.
-### CUST_CHAT 테이블 생성
-``` powershell
-aws dynamodb create-table `
-    --table-name CUST_CHAT `
-    --attribute-definitions `
-        AttributeName=ID,AttributeType=S `
-        AttributeName=CUSTOMER_KEY,AttributeType=S `
-    --key-schema `
-        AttributeName=ID,KeyType=HASH `
-    --global-secondary-indexes file://C:/yourworkspace/springAi/global-secondary-indexes.json `
-    --billing-mode PAY_PER_REQUEST `
-    --region ap-northeast-2
-```
+챗봇은 고객 상담 요청과 히스토리를 관리하기 위해 아래와 같이 DynamoDB 테이블을 사용합니다.
+
 ### CUST_CHAT_HISTORY 테이블 생성
 ``` powershell
 aws dynamodb create-table `
