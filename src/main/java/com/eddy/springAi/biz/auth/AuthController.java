@@ -34,7 +34,7 @@ public class AuthController {
             // JWT를 쿠키로 설정
             Cookie cookie = new Cookie("jwt", token);
             cookie.setHttpOnly(true); // 클라이언트에서 JS로 접근 불가
-            cookie.setMaxAge(60 * 60); // 1시간 사용 가능
+            cookie.setMaxAge(-1); // 세션 쿠키 설정 (브라우저 종료 시 삭제)
             cookie.setPath("/"); // 모든 경로에서 쿠키 사용
             response.addCookie(cookie);
 
@@ -57,7 +57,7 @@ public class AuthController {
             // 새 JWT를 쿠키에 추가
             Cookie cookie = new Cookie("jwt", newToken);
             cookie.setHttpOnly(true);
-            cookie.setMaxAge(60 * 60); // 1시간
+            cookie.setMaxAge(-1); // 세션 쿠키 설정 (브라우저 종료 시 삭제)
             cookie.setPath("/");
             response.addCookie(cookie);
 

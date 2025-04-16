@@ -27,7 +27,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // CSRF 비활성화
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/api/auth/**").permitAll() // 로그인 및 인증 API는 모두 접근 가능
-                        .requestMatchers("/chat.html").authenticated() // chat.html은 인증된 사용자만 접근 가능
+                        .requestMatchers("/chat").authenticated() // chat은 인증된 사용자만 접근 가능
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form

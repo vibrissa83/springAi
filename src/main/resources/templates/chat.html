@@ -159,7 +159,7 @@
         $('#refreshSession').click(function () {
             $.post('/api/auth/refresh', {}, function () {
                 alert('세션이 갱신되었습니다.');
-                sessionTimeout = 3600; // 세션 갱신 시 타이머 초기화
+                sessionTimeout = 1800; // 세션 갱신 시 타이머 초기화
             }).fail(function () {
                 alert('세션 갱신 실패. 다시 로그인해주세요.');
                 window.location.href = '/login';
