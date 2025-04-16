@@ -47,7 +47,7 @@ public class JwtTokenUtil {
     }
 
     // 내부적으로 Claims 반환
-    private Claims getClaims(String token) {
+    public Claims getClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()

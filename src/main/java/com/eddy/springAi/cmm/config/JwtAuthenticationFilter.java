@@ -43,13 +43,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (token != null && jwtTokenUtil.validateToken(token)) {
             String username = jwtTokenUtil.getUsernameFromToken(token);
 
-            // 사용자 정보를 Security Context에 추가
+            // 토큰 만료 시간이 임박한 경우 새 토큰 발급
+            long expirationTime = jwtTokenUtil.getClaims(token).getExpiration().getTime();
+            long currentTime = System.currentTimeMillis();
+
+            // 5분 이하로 남으면 새 토큰 발급
+            if (expirationTime - currentTime <= 5 * 60 * 1000) { // 5분
+                String newToken = jwtTokenUtil.generateToken(username);
+                Cookie newCookie = new Cookie("jwt", newToken);
+                newCookie.setHttpOnly(true);
+                newCookie.setPath("/");
+                newCookie.setMaxAge(-1); // 세션 쿠키
+                response.addCookie(newCookie);
+            }
+
+            // 사용자 인증 설정
             User principal = new User(username, "", java.util.Collections.emptyList());
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(principal, token, principal.getAuthorities());
-
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
+
 
 
         chain.doFilter(request, response);
