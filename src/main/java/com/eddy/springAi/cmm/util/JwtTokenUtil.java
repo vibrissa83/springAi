@@ -2,6 +2,7 @@ package com.eddy.springAi.cmm.util;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -10,17 +11,22 @@ import java.util.Date;
 @Component
 public class JwtTokenUtil {
 
-    private static final String SECRET_KEY = "a_secure_key_that_is_at_least_32_bytes_long";
-    private static final long EXPIRATION_TIME = 1000L * 60 * 30; // 30분
+    private final Key key;
+    private final long expirationTime;
 
-    private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    public JwtTokenUtil(
+            @Value("${app.jwt.secret-key}") String secretKey,
+            @Value("${app.jwt.expiration-time}") String expirationTime) {
+        this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
+        this.expirationTime = parseExpirationTime(expirationTime);
+    }
 
     // 토큰 생성
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -48,4 +54,16 @@ public class JwtTokenUtil {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
+    // "30m" 같은 시간 문자열을 밀리초로 변환
+    private long parseExpirationTime(String time) {
+        if (time.endsWith("m")) {
+            return Long.parseLong(time.replace("m", "")) * 1000 * 60;
+        } else if (time.endsWith("s")) {
+            return Long.parseLong(time.replace("s", "")) * 1000;
+        } else {
+            throw new IllegalArgumentException("Invalid expiration time format. Use 'm' for minutes or 's' for seconds.");
+        }
+    }
+
 }

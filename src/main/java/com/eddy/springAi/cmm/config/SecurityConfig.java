@@ -3,6 +3,7 @@ package com.eddy.springAi.cmm.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,6 +18,9 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    @Value("${app.session.maximum-sessions}")
+    private Integer maximumSessions;
+
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
@@ -27,19 +31,18 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // CSRF 비활성화
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/api/auth/**").permitAll() // 로그인 및 인증 API는 모두 접근 가능
-                        .requestMatchers("/chat").authenticated() // chat은 인증된 사용자만 접근 가능
+                        .requestMatchers("/chat").authenticated()            // chat은 인증된 사용자만 접근 가능
                         .anyRequest().permitAll()
                 )
                 .sessionManagement(sess -> sess
-                        .maximumSessions(1)                      // 중복 로그인 시 새로운 세션만 유지
-                        .expiredUrl("/login")                    // 세션 만료 시 /login으로 이동
-                        .maxSessionsPreventsLogin(false)         // 동일 계정 로그인 시 기존 세션 무효화
+                        .maximumSessions(maximumSessions)     // 최대 세션 수
+                        .expiredUrl("/login")                 // 세션 만료 시 /login으로 이동
+                        .maxSessionsPreventsLogin(false)      // 중복 로그인 시 기존 세션 무효화
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -50,4 +53,5 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }
