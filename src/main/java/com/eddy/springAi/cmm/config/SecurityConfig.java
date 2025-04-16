@@ -30,18 +30,10 @@ public class SecurityConfig {
                         .requestMatchers("/chat").authenticated() // chat은 인증된 사용자만 접근 가능
                         .anyRequest().permitAll()
                 )
-                .formLogin(form -> form
-                        .loginPage("/login") // 로그인이 필요한 경우 /login 페이지로 리다이렉트
-                        .defaultSuccessUrl("/chat", true) // 로그인 성공 시 Chat 페이지 이동
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login")     // 로그아웃 성공 시 로그인 페이지로 이동
-                        .permitAll()
-                )
                 .sessionManagement(sess -> sess
-                        .maximumSessions(1).expiredUrl("/login") // 세션 만료 시 로그인 페이지로 이동 세션 동시 접속 1개로 제한
+                        .maximumSessions(1)                      // 중복 로그인 시 새로운 세션만 유지
+                        .expiredUrl("/login")                    // 세션 만료 시 /login으로 이동
+                        .maxSessionsPreventsLogin(false)         // 동일 계정 로그인 시 기존 세션 무효화
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

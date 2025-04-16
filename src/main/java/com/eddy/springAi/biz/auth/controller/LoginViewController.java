@@ -1,4 +1,4 @@
-package com.eddy.springAi.biz.auth;
+package com.eddy.springAi.biz.auth.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
