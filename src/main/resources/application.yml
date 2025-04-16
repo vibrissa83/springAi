@@ -12,3 +12,8 @@ aws:
     region: ap-northeast-2 # 사용할 AWS Region (예: 서울 리전)
     access-key: Your_accessKey # AWS 액세스 키
     secret-key: Your_secretKey  # AWS 비밀 키
+
+server:
+  servlet:
+    session:
+      timeout: 30m # 세션 타임아웃 설정 (30분)
