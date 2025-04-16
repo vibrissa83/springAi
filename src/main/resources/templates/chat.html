@@ -71,6 +71,15 @@
 </head>
 <body>
 <div class="chat-container">
+    <div class="header">
+        <div class="user-info">
+            로그인 사용자: <span id="username">Loading...</span>
+        </div>
+        <div class="session-timer">
+            세션 종료까지: <span id="sessionTime">Loading...</span> 초
+            <button id="refreshSession">세션 갱신</button>
+        </div>
+    </div>
     <h2>현대 자동차 딜러 도우미</h2>
     <div class="select-container">
         <div>
@@ -103,6 +112,67 @@
 
 <script>
     $(document).ready(function () {
+        // 사용자 정보 및 세션 타이머 데이터 초기화
+        let sessionTimeout = 1800; // 기본 30분 세션 타임아웃 설정 (초 단위)
+
+        // 사용자 정보 및 세션 타이머 UI 업데이트
+        function updateUI() {
+            $('#username').text(getUsernameFromToken());
+            $('#sessionTime').text(sessionTimeout);
+        }
+
+        // JWT 토큰에서 사용자 이름 추출
+        function getUsernameFromToken() {
+            const token = getCookie('jwt');
+            if (token) {
+                try {
+                    const base64Payload = token.split('.')[1];
+                    const payload = JSON.parse(atob(base64Payload));
+                    return payload.sub || 'Guest';
+                } catch (e) {
+                    return 'Guest';
+                }
+            }
+            return 'Guest';
+        }
+        // 쿠키에서 JWT 가져오기
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        // 세션 타이머 감소 함수
+        function decreaseSessionTime() {
+            if (sessionTimeout > 0) {
+                sessionTimeout--;
+                $('#sessionTime').text(sessionTimeout);
+
+                if (sessionTimeout === 0) {
+                    alert('세션이 만료되었습니다. 다시 로그인해주세요.');
+                    window.location.href = '/login';
+                }
+            }
+        }
+
+        // 세션 갱신
+        $('#refreshSession').click(function () {
+            $.post('/api/auth/refresh', {}, function () {
+                alert('세션이 갱신되었습니다.');
+                sessionTimeout = 3600; // 세션 갱신 시 타이머 초기화
+            }).fail(function () {
+                alert('세션 갱신 실패. 다시 로그인해주세요.');
+                window.location.href = '/login';
+            });
+        });
+
+        // 세션 타이머 감소 주기 설정 (1초마다 실행)
+        setInterval(decreaseSessionTime, 1000);
+
+        // 초기 UI 로드
+        updateUI();
+
+
         const customerKey = getOrCreateCustomerKey(); // 브라우저에서 관리되는 customerKey
 
         // Send 버튼 클릭 이벤트

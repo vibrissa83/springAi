@@ -32,6 +32,7 @@ public class SecurityConfig {
                 )
                 .formLogin(form -> form
                         .loginPage("/login") // 로그인이 필요한 경우 /login 페이지로 리다이렉트
+                        .defaultSuccessUrl("/chat", true) // 로그인 성공 시 Chat 페이지 이동
                         .permitAll()
                 )
                 .logout(logout -> logout
@@ -39,7 +40,7 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login") // 로그아웃 성공 시 로그인 페이지로 이동
                 )
                 .sessionManagement(sess -> sess
-                        .maximumSessions(1) // 세션 동시 접속 1개로 제한 (필요 시 설정)
+                        .maximumSessions(1).expiredUrl("/login") // 세션 만료 시 로그인 페이지로 이동 세션 동시 접속 1개로 제한
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
