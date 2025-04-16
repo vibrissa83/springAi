@@ -11,7 +11,7 @@ import java.util.Date;
 public class JwtTokenUtil {
 
     private static final String SECRET_KEY = "a_secure_key_that_is_at_least_32_bytes_long";
-    private static final long EXPIRATION_TIME = 1000L * 60 * 60; // 1시간
+    private static final long EXPIRATION_TIME = 1000L * 60 * 30; // 30분
 
     private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 

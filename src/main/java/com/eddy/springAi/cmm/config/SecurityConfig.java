@@ -37,7 +37,8 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login") // 로그아웃 성공 시 로그인 페이지로 이동
+                        .logoutSuccessUrl("/login")     // 로그아웃 성공 시 로그인 페이지로 이동
+                        .permitAll()
                 )
                 .sessionManagement(sess -> sess
                         .maximumSessions(1).expiredUrl("/login") // 세션 만료 시 로그인 페이지로 이동 세션 동시 접속 1개로 제한

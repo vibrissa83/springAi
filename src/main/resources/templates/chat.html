@@ -74,6 +74,7 @@
     <div class="header">
         <div class="user-info">
             로그인 사용자: <span id="username">Loading...</span>
+            <button id="logoutButton">로그아웃</button> <!-- 로그아웃 버튼 -->
         </div>
         <div class="session-timer">
             세션 종료까지: <span id="sessionTime">Loading...</span> 초
@@ -164,6 +165,18 @@
                 alert('세션 갱신 실패. 다시 로그인해주세요.');
                 window.location.href = '/login';
             });
+        });
+
+        // 로그아웃 버튼 이벤트
+        $('#logoutButton').click(function () {
+            $.post('/api/auth/logout')
+                .done(function () {
+                    alert("로그아웃되었습니다.");
+                    window.location.href = '/login'; // 로그인 페이지로 리다이렉트
+                })
+                .fail(function () {
+                    alert("로그아웃 요청에 실패했습니다.");
+                });
         });
 
         // 세션 타이머 감소 주기 설정 (1초마다 실행)

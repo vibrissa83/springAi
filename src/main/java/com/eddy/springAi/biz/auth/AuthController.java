@@ -66,4 +66,17 @@ public class AuthController {
         return ResponseEntity.status(401).body("Unauthorized");
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        // JWT 쿠키 삭제
+        Cookie cookie = new Cookie("jwt", null);
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0); // 만료 시간 0으로 설정 (즉시 삭제)
+        cookie.setPath("/");
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok("Logout successful");
+    }
+
+
 }
