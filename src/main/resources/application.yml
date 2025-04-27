@@ -3,17 +3,22 @@ spring:
     name: springAi
   ai:
     openai:
-      api-key: Your_apiKey
-      model: gpt-4o                        # 모델 이름 명시
-      max-tokens: 2000                     # 출력 토큰 제한 설정 (필요에 따라 가변)
-      temperature: 0.8                     # Chatbot의 응답의 창의성 설정
+      api-key: YOUR_OPENAI_API_KEY        # OpenAI API 키
+      model: gpt-4o                      # 모델 이름 명시
+      max-tokens: 2000                   # 출력 토큰 제한 설정 (필요에 따라 가변)
+      temperature: 0.8                   # Chatbot의 응답의 창의성 설정
 aws:
   dynamodb:
-    region: ap-northeast-2 # 사용할 AWS Region (예: 서울 리전)
-    access-key: Your_accessKey # AWS 액세스 키
-    secret-key: Your_secretKey  # AWS 비밀 키
-
+    region: ap-northeast-2               # 사용할 AWS Region (예: 서울 리전)
+    access-key: YOUR_ACCESS_KEY          # AWS 액세스 키
+    secret-key: YOUR_SECRET_KEY          # AWS 비밀 키
+app:
+  session:
+    maximum-sessions: 1                  # 최대 동시 사용자 세션 수 설정
+  jwt:
+    secret-key: wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY1234567890    # JWT 비밀 키
+    expiration-time: 30m                 # 토큰 유효기간 설정 (예: 30m 또는 3600000ms)
 server:
   servlet:
     session:
-      timeout: 30m # 세션 타임아웃 설정 (30분)
+      timeout: 30m                       # 세션 타임아웃 설정 (30분)
